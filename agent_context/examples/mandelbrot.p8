@@ -1,0 +1,48 @@
+%import textio
+%import floats
+%zeropage basicsafe
+
+; Note: this program can be compiled for multiple target systems.
+
+main {
+    const ubyte width = 30
+    const ubyte height = 20
+    const ubyte max_iter = 16
+
+    sub start()  {
+        txt.print("calculating mandelbrot fractal...")
+        cbm.SETTIM(0, 0, 0)
+
+        ubyte pixelx
+        ubyte pixely
+
+        for pixely in 0 to height-1 {
+            float yy = (pixely as float)/0.4/height - 1.0
+
+            for pixelx in 0 to width-1 {
+                float xx = (pixelx as float)/0.3/width - 2.2
+
+                float xsquared = 0.0
+                float ysquared = 0.0
+                float x = 0.0
+                float y = 0.0
+                ubyte iter = 0
+
+                while iter<max_iter and xsquared+ysquared<4.0 {
+                    y = x*y*2.0 + yy
+                    x = xsquared - ysquared + xx
+                    xsquared = x*x
+                    ysquared = y*y
+                    iter++
+                }
+                txt.setcc(pixelx+4, pixely+1, 160, max_iter-iter)
+            }
+        }
+
+        float duration = (cbm.RDTIM16() as float) / 60
+        txt.plot(0, 21)
+        txt.print("finished in ")
+        floats.print(duration)
+        txt.print(" seconds!\n")
+    }
+}
