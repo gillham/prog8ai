@@ -1,6 +1,0 @@
-# This works like a .gitignore file, but for AI assistants / agents.
-
-# macOS file
-.DS_Store
-
-# maybe add build/ directory?
