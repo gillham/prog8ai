@@ -1,7 +1,5 @@
 # Agent context
 
-
-
 ## Prog8 language overview
 
 The Prog8 compiler and its source code is a submodule in the `.prog8compiler`
@@ -14,8 +12,17 @@ The syntax of the Prog8 language is documented in an ANTLR4 grammar file.
 Read `.prog8compiler/parser/src/main/antlr/Prog8ANTLR.g4` to understand the
 Prog8 grammar.
 
-There is documentation in `.prog8compiler/docs/source` but read the rest of
-this file before looking for that documentation.
+There is documentation in `.prog8compiler/docs/source` and here is a
+table of the most relevant files to view:
+|Filename|
+|--------|
+|`compiling.rst`|
+|`libraries.rst`|
+|`programming.rst`|
+|`structpointers.rst`|
+|`targetsystem.rst`|
+|`variables.rst`|
+
 
 ## Agent skills
 
@@ -30,52 +37,94 @@ submodule.
 .prog8compiler/.agents/skills/asm6502-coder/SKILL.md
 ```
 
+## Prog8 context files
+
+This table will have context files with a status of stub, partial, or done.
+These files must only add what the upstream skills don't already cover.
+NOTE: Ignore files with the status of "stub" as they are useless.
+
+| Filename                       |Status|Description|
+|--------------------------------|------|-----------|
+| `.context/asm-integration.md`  |stub|6502 assembly integration|
+| `.context/emulators.md`        |stub|emulator integration|
+| `.context/errors.md`           |stub|Common errors in Prog8 coding|
+| `.context/examples.md`         |stub|Examples of Prog8 coding|
+| `.context/gotchas.md`          |stub|Common gotchas in Prog8 coding|
+| `.context/hardware-summary.md` |stub|Hardware summaries for Prog8 targets|
+| `.context/modules.md`          |stub|Prog8 standard library modules and their use|
+| `.context/patterns.md`         |stub|Prog8 coding patterns and best practices|
+| `.context/versions.md`         |stub|Prog8 compiler versions and their features|
+
+### Finding context
+- When using `grep` to look at context files in `.prog8compiler` you need to add `--include=*.p8` to limit the searches to only Prog8 source code.
+- Never search these directories for files (unless given a specific filename):
+  - `.prog8compiler/compiler/src`
+  - `.prog8compiler/codeCore`
+  - `.prog8compiler/codeGen*`
+  - `.prog8compiler/intermediate`
+  - `.prog8compiler/parser/` (Except for parser/src/main/antlr/Prog8ANTLR.g4)
+
 ## Prog8 standard library code
 
 The source code to the Prog8 standard library for the common modules
-and per target modules are in: ` .prog8compiler/compiler/res/prog8lib/`.
+and per target modules are in: `.prog8compiler/compiler/res/prog8lib/`.
+
+The Prog8 standard library can be searched using the `prog8c` command
+with the `-libsearch` argument which takes a regex in quotes.
+Example:
+`prog8c -libsearch 'sub\s+print'` searches for any subroutines starting
+with `print`
+`prog8c -libsearch 'txt\.print_ub'` searches for actual uses of the
+`txt.print_ub` subroutine.
+`prog8c -libsearch 'sub\s+print\('` looks specifically for the
+subroutine `print` but might not find all instances on the different targets.
+`prog8c -libsearch 'sub\s+print\s?\('` looks specifically for the
+subroutine `print` which could have whitespace after it prior to the '('.
+
+The `prog8c -libsearch` command should be the preferred way to search
+the standard library, but see the `-libdump` argument below for a less
+efficient option.
 
 The standard library source code can be dumped by the compiler binary
-as well by running it with the `-libdump` argument.  This allows getting
+as well by running it with the `-libdump build/` argument.  This allows getting
 the example standard library source code for the compiler you will run.
 The source code in `.prog8compiler` is likely to be slightly different from
 the version `prog8c` will use, but it will be close enough most of the time.
 
-The command `prog8c -libdump .` will create a directory based on the compiler
-version number in the current directory that holds the exact matching standard
-library for this prog8c binary.
-Here are some prog8c compiler versions and library directory names.
-| Prog8 compiler version | Standard librarys source code directory |
-| --- | --- |
-|v12.1|prog8lib-12.1|
-|v12.1.1|prog8lib-12.1.1|
-|v12.2|prog8lib-12.2|
-|v12.3-SNAPSHOT|prog8lib-12.3-SNAPSHOT|
+After we run the command `prog8c -libdump build/` there will be a directory in
+`build/` with the standard library source code.
+Find it by running: `ls -d build/prog8lib-*`
 
+If a different version of the compiler is run you could end up with multiple
+directories in `build/` that match. An explicit `make clean` should be run
+before running `prog8c -libdump build/` if using a different version.
 
-.prog8compiler/compiler/test/arithmetic
-.prog8compiler/compiler/test/comparisons
-.prog8compiler/compiler/test/fixtures
-.prog8compiler/docs/
+The results from `prog8c -libsearch` and `prog8c -libdump` should be trusted over
+source code from the `.prog8compiler` directory which might be out of date or
+not match the `prog8c` binary being used.
+
+When using versions of `prog8c` older than v12.2, warn the user and ask if they
+want to proceed with the older version of the compiler.
 
 
 ## Prog8 sample code
-- `agent_context/compiler` - Contains the Prog8 standard library and Prog8 test code used during building the compiler
-- `agent_context/parser` - ANTLR4 parser implementation
-- `agent_context/docs` - Documentation files
-- `agent_context/examples` - Example Prog8 programs
+- `.prog8compiler/examples/`
+- `.prog8compiler/benchmark-program/`
+- `.prog8compiler/compiler/test/arithmetic/`
+- `.prog8compiler/compiler/test/comparisons/`
+- `.prog8compiler/compiler/test/fixtures/`
 
+## Syntax checking Prog8 source
 
-.prog8compiler/benchmark-program/
-.prog8compiler/examples/
+You can run `make check` to have the compiler perform a syntax check of the
+source code without attempting to compile it.  This quickly gives feedback
+on source code changes.
 
+You can run `make test` to compile the source code against the virtual
+machine target and compare its output against expected results. Obviously
+as software features are written, additional files in `tests/expected` would
+need to be added and the test target in `Makefile` adjusted to account for it.
 
+Ask before changing any of the tests.
 
-## Compiling Prog8 programs
-
-## Running Prog8 programs
-
-## Testing Prog8 programs
-
-## Debugging Prog8 programs
 
