@@ -4,7 +4,7 @@
 
 The Prog8 compiler and its source code is a submodule in the `.prog8compiler`
 directory off the root of this repository. The compiler is written in Kotlin
-and JAVA, but we are  only interested in the Prog8 and 6502 assembler 
+and JAVA, but we are only interested in the Prog8 and 6502 assembler 
 portions of the repository.  It is wrong to attempt to use Kotlin or JAVA
 examples or source code when developing Prog8 or 6502 assembler programs.
 
@@ -43,17 +43,20 @@ This table will have context files with a status of stub, partial, or done.
 These files must only add what the upstream skills don't already cover.
 NOTE: Ignore files with the status of "stub" as they are useless.
 
+The filenames below are all in the `.context/` directory off the
+root of the repository.
+
 | Filename                       |Status|Description|
 |--------------------------------|------|-----------|
-| `.context/asm-integration.md`  |stub|6502 assembly integration|
-| `.context/emulators.md`        |stub|emulator integration|
-| `.context/errors.md`           |stub|Common errors in Prog8 coding|
-| `.context/examples.md`         |stub|Examples of Prog8 coding|
-| `.context/gotchas.md`          |stub|Common gotchas in Prog8 coding|
-| `.context/hardware-summary.md` |stub|Hardware summaries for Prog8 targets|
-| `.context/modules.md`          |stub|Prog8 standard library modules and their use|
-| `.context/patterns.md`         |stub|Prog8 coding patterns and best practices|
-| `.context/versions.md`         |stub|Prog8 compiler versions and their features|
+| `asm-integration.md`  |stub|6502 assembly integration|
+| `emulators.md`        |stub|emulator integration|
+| `errors.md`           |stub|Common errors in Prog8 coding|
+| `examples.md`         |stub|Examples of Prog8 coding|
+| `gotchas.md`          |stub|Common gotchas in Prog8 coding|
+| `hardware-summary.md` |stub|Hardware summaries for Prog8 targets|
+| `modules.md`          |stub|Prog8 standard lib modules and usage|
+| `patterns.md`         |stub|Prog8 coding patterns and best practices|
+| `versions.md`         |stub|Prog8 compiler versions and their features|
 
 ### Finding context
 - When using `grep` to look at context files in `.prog8compiler`
@@ -72,17 +75,23 @@ Since features are added or regressions might occur in newer versions of the
 compiler it is important to check the `prog8c` compiler version against the
 git commit of the `.prog8compiler` upstream repository submodule.
 
-At the start of a session you can run these two commands and compare the 
+At the start of a session you can run these two commands and compare the
 versions:
 ```
 prog8c -version
-git -C .prog8compiler rev-parse --short HEAD
+git -C .prog8compiler describe --tags
 ```
 
 Compare the git commits and if they don't match you should warn the
 user, but you can continue working. You can ask if they want to
-run `git submodule update --recursive` but this should only be once
-per session not everytime.
+run `git submodule update --remote --recursive` to repinning the upstream
+repository. This should only be once per session not every time.
+
+The upstream repository does not tag each prerelease or snapshot but does
+tag beta and production releases.  So the git commit is a more reliable
+method of checking for drift and the version number plus the commit is
+probably the best.
+
 
 ## Prog8 standard library code
 

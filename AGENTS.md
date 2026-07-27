@@ -8,8 +8,8 @@ point for understanding the Prog8 language and how to use it.
 - This project is software written in the Prog8 programming language.
 - This project uses `make` with instructions written in the `Makefile`.
   - After changing source code run `make check` to syntax check it
-  - Use `make run` to compile and run on the virtual target .
-  - After `make clean` you might to run `prog8c -libdump build/` again,
+  - Use `make run` to compile and run on the virtual target.
+  - After `make clean` you might need to run `prog8c -libdump build/` again,
     but only if you're using the `-libdump` workflow.  The preferred
     tool is using `-libsearch` which doesn't need the `-libdump` at all.
   - You should run `make test` to validate the output matches expected.

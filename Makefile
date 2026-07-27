@@ -20,7 +20,7 @@
 # build:
 #     creates the `build/` directory
 #
-# clean: 
+# clean:
 #     removes everything in `build/`
 #
 # build/mainc64.prg:
@@ -39,7 +39,7 @@
 #     runs a compiler syntax check without attempting to compile.
 #     use it for quickly finding syntax errors in the source code.
 #
-# test;
+# test:
 #     compiles and runs on the virtual target and compares the output
 #     to expected output.  use to validate correct source code changes
 #     (presumably the expected results will change as features are written)
