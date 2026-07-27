@@ -1,3 +1,4 @@
 [submodule ".prog8compiler"]
-	path = .prog8compiler
-	url = https://github.com/irmen/prog8.git
+        path = .prog8compiler
+        url = https://github.com/irmen/prog8.git
+        branch = master
