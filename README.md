@@ -25,5 +25,5 @@ use AI agents and provide context without duplication.
 # Usage
 
 You *must* init the git submodules if you did not recursively clone this repo.
-Run: `git submodule update --init --depth 1` to clone the Prog8 compiler source
+Run: `git submodule update --init` to clone the Prog8 compiler source
 as a submodule which is critical for AI context.
