@@ -34,6 +34,15 @@
 #
 # emu:
 #     depends on `all` and runs the C64 binary under the VICE emulator.
+#
+# check:
+#     runs a compiler syntax check without attempting to compile.
+#     use it for quickly finding syntax errors in the source code.
+#
+# test;
+#     compiles and runs on the virtual target and compares the output
+#     to expected output.  use to validate correct source code changes
+#     (presumably the expected results will change as features are written)
 
 # Cross-platform removal command
 ifeq ($(OS),Windows_NT)

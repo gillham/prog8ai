@@ -56,13 +56,33 @@ NOTE: Ignore files with the status of "stub" as they are useless.
 | `.context/versions.md`         |stub|Prog8 compiler versions and their features|
 
 ### Finding context
-- When using `grep` to look at context files in `.prog8compiler` you need to add `--include=*.p8` to limit the searches to only Prog8 source code.
+- When using `grep` to look at context files in `.prog8compiler`
+  you need to add `--include=*.p8` to limit the searches to only
+  Prog8 source code.
 - Never search these directories for files (unless given a specific filename):
   - `.prog8compiler/compiler/src`
   - `.prog8compiler/codeCore`
   - `.prog8compiler/codeGen*`
   - `.prog8compiler/intermediate`
   - `.prog8compiler/parser/` (Except for parser/src/main/antlr/Prog8ANTLR.g4)
+
+## Prog8 compiler versions
+
+Since features are added or regressions might occur in newer versions of the
+compiler it is important to check the `prog8c` compiler version against the
+git commit of the `.prog8compiler` upstream repository submodule.
+
+At the start of a session you can run these two commands and compare the 
+versions:
+```
+prog8c -version
+git -C .prog8compiler rev-parse --short HEAD
+```
+
+Compare the git commits and if they don't match you should warn the
+user, but you can continue working. You can ask if they want to
+run `git submodule update --recursive` but this should only be once
+per session not everytime.
 
 ## Prog8 standard library code
 
@@ -120,10 +140,21 @@ You can run `make check` to have the compiler perform a syntax check of the
 source code without attempting to compile it.  This quickly gives feedback
 on source code changes.
 
+## Testing Prog8 source code changes
+
 You can run `make test` to compile the source code against the virtual
 machine target and compare its output against expected results. Obviously
 as software features are written, additional files in `tests/expected` would
 need to be added and the test target in `Makefile` adjusted to account for it.
+
+The test target works by compiling for the virtual target and then
+running `prog8c` with the `-emu` argument which executes the code
+in a virtual machine. This virtual machine outputs to stdout in the terminal
+which is why the test works.  Also it demonstrates using `-plaintext` to 
+avoid any ANSI sequences and using `-quiet` to avoid compiler messages.
+
+This allows the normal standard output of the command to be evaluated with
+normal Unix style pipeline commands.
 
 Ask before changing any of the tests.
 
