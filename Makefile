@@ -103,8 +103,8 @@ clean:
 run:	all
 	$(PCC) -vm build/main.p8ir
 
-emu:	all
-	$(EMU)
+emu:	build/mainc64.prg
+	$(EMU) -autostartprgmode 1 $<
 
 test:	all
 	$(PCC) -quiet $(PCCARGSVM) -emu $(SRCS) | diff -u tests/expected/virtual_main.txt -
