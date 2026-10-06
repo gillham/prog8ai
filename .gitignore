@@ -2,3 +2,5 @@
 build/
 # libdump output should be ignored anywhere we see it.
 prog8lib-*/
+# agent related
+.claude/settings.local.json

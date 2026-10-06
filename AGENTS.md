@@ -3,21 +3,18 @@
 ## Agent skills
 
 The author of the Prog8 compiler has created agent skill files for writing
-software with Prog8 and 6502 assembler.  Please read the two files below
-to understand these skills.  Note that any file references in the skills
-files would be relative to the `.prog8compiler` directory since it is a
-submodule.
+software with Prog8 and 6502 assembler.
 
-```
-.prog8compiler/.agents/skills/prog8-coder/SKILL.md
-.prog8compiler/.agents/skills/asm6502-coder/SKILL.md
-```
+Note that any file references in the skills files below would be relative
+to the `.prog8compiler` directory since it is a submodule.
 
-## Prog8 context
-Read the file `CONTEXT.md` in the root of the repository as the starting
-point for understanding the Prog8 language and how to use it.
+Read `.prog8compiler/.agents/skills/prog8-coder/SKILL.md` when writing or
+reviewing Prog8 code (skip this if your tool already loaded it as a skill).
 
-## This project
+Only read `.prog8compiler/.agents/skills/asm6502-coder/SKILL.md`
+when writing or debugging `%asm`, `asmsub`, `extsub`, or `.asm` code.
+
+## Prog8 project
 - This project is software written in the Prog8 programming language.
 - This project uses `make` with instructions written in the `Makefile`.
   - After changing source code run `make check` to syntax check it
@@ -66,5 +63,136 @@ point for understanding the Prog8 language and how to use it.
 - When writing Prog8 code, or changing existing code, use the `-check`
   option to the compiler.  This will quickly check for correct syntax
   without generating any output. If Prog8 code is correct, then the compiler
-  can be run normally.  Example syntax check:
-  `prog8c -check -target virtual myprogram.p8`
+  can be run normally.
+
+# Agent context
+
+## Prog8 language overview
+
+The Prog8 compiler and its source code is a submodule in the `.prog8compiler`
+directory off the root of this repository. The compiler is written in Kotlin
+and JAVA, but we are only interested in the Prog8 and 6502 assembler 
+portions of the repository.  It is wrong to attempt to use Kotlin or JAVA
+examples or source code when developing Prog8 or 6502 assembler programs.
+
+The syntax of the Prog8 language is documented in an ANTLR4 grammar file.
+If a syntax question isn't answered by an existing skill file or a `-check`
+message, grep `.prog8compiler/parser/src/main/antlr/Prog8ANTLR.g4` for the rule.
+
+There is documentation in `.prog8compiler/docs/source` and below is a
+table of the most relevant files to view.
+Do not blindly read all of the files.  Use the command below, replacing `libraries.rst`
+with the appropriate file, to see the section headers.
+
+`awk 'NR>1 && /^[\^\*=~-]+$/ && prev ~ /^[A-Za-z]/ {print (NR-1) ": " prev} {prev=$0}' .prog8compiler/docs/source/libraries.rst`
+
+|Filename|
+|--------|
+|`compiling.rst`|
+|`libraries.rst`|
+|`programming.rst`|
+|`structpointers.rst`|
+|`targetsystem.rst`|
+|`variables.rst`|
+
+
+## Prog8 context files
+
+This table will have context files with a status of stub, partial, or done.
+These files must only add what the upstream skills don't already cover.
+NOTE: Ignore files with the status of "stub" as they are useless.
+
+The filenames below are all in the `.context/` directory off the
+root of the repository.
+
+| Filename                       |Status|Description|
+|--------------------------------|------|-----------|
+| `modules.md`         |partial|Prog8 standard library modules|
+| `versions.md`         |partial|Prog8 compiler versions and their features|
+
+### Finding context
+- When grepping in `.prog8compiler` you need to add `--include=*.p8`
+to limit the searches to only Prog8 source code.
+- Never search these directories for files (unless given a specific filename):
+  - `.prog8compiler/compiler/src`
+  - `.prog8compiler/codeCore`
+  - `.prog8compiler/codeGen*`
+  - `.prog8compiler/intermediate`
+  - `.prog8compiler/parser` (Except for parser/src/main/antlr/Prog8ANTLR.g4)
+
+## Prog8 compiler versions
+
+Only look in `.context/versions.md` if there is a possible compiler bug.
+
+## Prog8 standard library code
+
+The source code to the Prog8 standard library for the common modules
+and per target modules are in: `.prog8compiler/compiler/res/prog8lib/`, but
+you should never blindly read the whole files.
+
+The Prog8 standard library can be searched using the `prog8c` command
+with the `-libsearch` argument which takes a regex in quotes.
+Example:
+`prog8c -libsearch 'sub\s+print'` searches for any subroutines starting
+with `print`
+`prog8c -libsearch 'txt\.print_ub'` searches for actual uses of the
+`txt.print_ub` subroutine.
+`prog8c -libsearch 'sub\s+print\('` looks specifically for the
+subroutine `print` but might not find all instances on the different targets.
+`prog8c -libsearch 'sub\s+print\s?\('` looks specifically for the
+subroutine `print` which could have whitespace after it prior to the '('.
+
+The `prog8c -libsearch` command is the preferred way to search
+the standard library.
+
+Normally it should not be necessary, but the standard library source code
+can be dumped by the compiler binary by running it with `-libdump build/`.
+The command will create a directory in `build/` with the standard library
+source code.  Find it by running: `ls -d build/prog8lib-*`
+
+This allows getting the example standard library source code for the exact compiler
+in use.
+The source code in `.prog8compiler` is likely to be slightly different from
+the version `prog8c` will use, but it will be close enough most of the time.
+
+If a different version of the compiler is run you could end up with multiple
+directories in `build/` that match. An explicit `make clean` should be run
+before running `prog8c -libdump build/` if using a different version.
+
+The results from `prog8c -libsearch` and `prog8c -libdump` should be trusted
+over source code from the `.prog8compiler` directory which might be out of
+date or not match the `prog8c` binary being used.
+
+When using versions of `prog8c` older than v12.2, warn the user and ask if they
+want to proceed with the older version of the compiler.
+
+
+## Prog8 sample code
+Do not blindly read whole example files.  Use `grep`.
+
+Directories with some example code written in Prog8:
+- `.prog8compiler/examples/`
+- `.prog8compiler/benchmark-program/`
+- `.prog8compiler/compiler/test/arithmetic/`
+- `.prog8compiler/compiler/test/comparisons/`
+- `.prog8compiler/compiler/test/fixtures/`
+
+## Testing Prog8 source code changes
+
+You can run `make test` to compile the source code against the virtual
+machine target and compare its output against expected results. Obviously
+as software features are written, additional files in `tests/expected` would
+need to be added and the test target in `Makefile` adjusted to account for it.
+
+The test target works by compiling for the virtual target and then
+running `prog8c` with the `-emu` argument which executes the code
+in a virtual machine. This virtual machine outputs to stdout in the terminal
+which is why the test works.  Also it demonstrates using `-plaintext` to 
+avoid any ANSI sequences and using `-quiet` to avoid compiler messages.
+
+This allows the normal standard output of the command to be evaluated with
+normal Unix style pipeline commands.
+
+Ask before changing any of the tests.
+
+

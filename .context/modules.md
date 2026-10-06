@@ -1,5 +1,3 @@
-**STUB — no content yet. Do not rely on this file.**
-
 # Modules
 ## buffers
 Module: buffers

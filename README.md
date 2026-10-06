@@ -1,9 +1,8 @@
 # Prog8 AI context for developing user programs
 
 This repository uses the official Prog8 compiler repository as a submodule.
-The various AGENTS.md and CONTEXT.md files reference upstream documents and
-add additional information to help with writing programs with Prog8 and
-inline 6502 assembly.
+The AGENTS.md file references upstream documents and add additional
+information to help with writing programs with Prog8 and inline 6502 assembly.
 
 Some critical code sections like startup code for a target might be written
 directly in 6502 assembly language in .asm files and included either by
