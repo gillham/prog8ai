@@ -1,18 +1,5 @@
 # AGENTS
 
-## Agent skills
-
-The author of the Prog8 compiler has created agent skill files for writing
-software with Prog8 and 6502 assembler.  Please read the two files below
-to understand these skills.  Note that any file references in the skills
-files would be relative to the `.prog8compiler` directory since it is a
-submodule.
-
-```
-.prog8compiler/.agents/skills/prog8-coder/SKILL.md
-.prog8compiler/.agents/skills/asm6502-coder/SKILL.md
-```
-
 ## Prog8 context
 Read the file `CONTEXT.md` in the root of the repository as the starting
 point for understanding the Prog8 language and how to use it.
