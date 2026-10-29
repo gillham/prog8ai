@@ -1,41 +1,23 @@
-# EditorConfig for Prog8 *user* projects
-# Ensures consistent formatting across editors and team members
-# See https://editorconfig.org
-
+# Editor settings for this project: https://editorconfig.org
 root = true
 
-# All files
+# Defaults: UTF-8, Unix line endings and 4-space indents.  This also
+# covers Prog8 (.p8) and 64tass assembler (.asm) sources.
 [*]
 charset = utf-8
 end_of_line = lf
+indent_style = space
+indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
-indent_style = space
-indent_size = 4
 
-# Prog8 source files (.p8)
-[*.p8]
-indent_style = space
-indent_size = 4
-
-# Assembly files (.asm) - 64tass syntax
-[*.asm]
-indent_style = space
-indent_size = 4
-
-# Makefiles require real tabs
+# make needs recipe lines indented with tabs
 [Makefile]
 indent_style = tab
-indent_size = 4
 
-# Documentation files
-[*.md]
+# Trailing spaces can be significant in Markdown (line breaks)
+[*.{md,rst}]
 trim_trailing_whitespace = false
 
-[*.rst]
-trim_trailing_whitespace = false
-
-# Git ignore files
 [.gitignore]
-indent_style = space
 indent_size = 2
