@@ -6,6 +6,8 @@
 .claude/skills/prog8-coder
 # build artifacts
 build/
+# Ctags files
+tags
 # libdump output should be ignored anywhere we see it.
 prog8lib-*/
 # agent related

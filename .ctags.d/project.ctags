@@ -1,0 +1,6 @@
+--recurse=yes
+--fields=+nKz
+--exclude=.git
+--exclude=.prog8-reference
+--exclude=build
+--exclude=.claude

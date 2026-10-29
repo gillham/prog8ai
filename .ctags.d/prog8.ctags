@@ -1,0 +1,58 @@
+#
+# prog8.ctags for Universal Ctags
+#
+# Names are Prog8 identifiers: a letter or underscore, then letters,
+# digits or underscores.  Every declaration may start with "private".
+#
+
+# define language and extension
+--langdef=Prog8
+--map-Prog8=+.p8
+
+# define kinds of things Prog8 has
+--kinddef-Prog8=a,asmsub,assembly subroutines
+--kinddef-Prog8=b,block,blocks
+--kinddef-Prog8=c,const,constants
+--kinddef-Prog8=e,extsub,external subroutines
+--kinddef-Prog8=l,label,labels
+--kinddef-Prog8=n,enum,enumerations
+--kinddef-Prog8=s,sub,subroutines
+--kinddef-Prog8=t,struct,structures
+--kinddef-Prog8=v,variable,variables
+--kinddef-Prog8=y,alias,aliases
+
+# Captures myblock: myblock $c000 {
+# Blocks only appear at module level, so they start in column 0.
+--regex-Prog8=/^([_[:alpha:]][_[:alnum:]]*)([\t ]+[$%]?[[:xdigit:]_]+)?[\t ]*\{/\1/b/
+
+# Captures foo: [private] [inline] sub foo(
+--regex-Prog8=/^[\t ]*(private[\t ]+)?(inline[\t ]+)?sub[\t ]+([_[:alpha:]][_[:alnum:]]*)[\t ]*\(/\3/s/
+
+# Captures bar: [private] [inline] asmsub bar(
+--regex-Prog8=/^[\t ]*(private[\t ]+)?(inline[\t ]+)?asmsub[\t ]+([_[:alpha:]][_[:alnum:]]*)[\t ]*\(/\3/a/
+
+# Captures rom1: [private] extsub [@bank 10] $2000 = rom1(
+--regex-Prog8=/^[\t ]*(private[\t ]+)?extsub[\t ]+[^=]+=[\t ]*([_[:alpha:]][_[:alnum:]]*)[\t ]*\(/\2/e/
+
+# Captures foobar: [private] const ubyte foobar = $00
+--regex-Prog8=/^[\t ]*(private[\t ]+)?const[\t ]+[[:alpha:]]+[\t ]+([_[:alpha:]][_[:alnum:]]*)/\2/c/
+
+# Captures foobar: [private] [&] ubyte foobar / byte[] foobar / ^^Node foobar
+# Captures foobar: uword @nozp @shared foobar = $0000
+--regex-Prog8=/^[\t ]*(private[\t ]+)?&?[\t ]*(bool|u?word|u?byte|float|long|str|\^\^[_[:alpha:]][_.[:alnum:]]*)(\[[^]]*\]){0,2}([\t ]+@[[:alnum:]]+)*[\t ]+([_[:alpha:]][_[:alnum:]]*)/\5/v/
+
+# Captures Item: [private] struct Item {
+--regex-Prog8=/^[\t ]*(private[\t ]+)?struct[\t ]+([_[:alpha:]][_[:alnum:]]*)/\2/t/
+
+# Captures Color: [private] enum Color {
+--regex-Prog8=/^[\t ]*(private[\t ]+)?enum[\t ]+([_[:alpha:]][_[:alnum:]]*)/\2/n/
+
+# Captures print: [private] alias print = txt.print
+--regex-Prog8=/^[\t ]*(private[\t ]+)?alias[\t ]+([_[:alpha:]][_[:alnum:]]*)[\t ]*=/\2/y/
+
+# Captures loop: loop:  (a label is alone on its line)
+--regex-Prog8=/^[\t ]*([_[:alpha:]][_[:alnum:]]*):[\t ]*(;.*)?$/\1/l/
+
+#
+# end-of-file
+#
