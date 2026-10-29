@@ -1,5 +1,13 @@
 # AGENTS
 
+## Setup check
+
+Before any Prog8 work, check that `.prog8-reference/VERSION` exists.  If it
+does not, the reference files have not been downloaded yet: stop and ask
+the user to run `python3 setup.py` (or `py setup.py` on Windows) from the
+repository root, or offer to run it yourself.  Do not continue without
+the reference files.
+
 ## Agent skills
 
 The author of the Prog8 compiler has created agent skill files for writing
