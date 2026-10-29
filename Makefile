@@ -9,7 +9,8 @@
 # running `prog8c` for example.
 #
 # The 64tass (or Tass64) assembler is needed by the compiler.
-# The C64 emulator requires VICE.
+# The C64 emulation requires VICE.
+# The X16 emulation requires x16emu.
 #
 # Make targets and explanations:
 # all:
@@ -26,14 +27,20 @@
 # build/mainc64.prg:
 #     builds the program for the C64 target
 #
+# build/maincx16.prg:
+#     builds the program for the CX16 target
+#
 # build/main.p8ir:
 #     builds the program for the virtual target
 #
 # run:
 #     depends on the `all` target and then runs in the virtual emulator target
 #
-# emu:
-#     depends on `all` and runs the C64 binary under the VICE emulator.
+# c64:
+#     depends on $(SRCS), builds the C64 binary and launches it in VICE.
+#
+# cx16:
+#     depends on $(SRCS), builds the CX16 binary and launches it in x16emu.
 #
 # check:
 #     runs a compiler syntax check without attempting to compile.
@@ -59,25 +66,12 @@ else
     MV = mv
 endif
 
-# Emulator settings
-EMU_CMD=x64sc
-EMU_BASE=-default -keymap 1 -model ntsc
-EMU_DISK=-fs8 build -devicebackend8 1 -busdevice8 -trapdevice8
-#EMU_KERNAL=-kernal jiffykernal
-EMU_REUSIZE=2048
-# build/reu-image.bin is a runtime artifact that we want cleaned up
-# by the `make clean` target.  Normal edit/compile/run cycles will
-# reuse the file, but `make clean` should clean it.  This matters
-# when the REU contents gets corrupted.
-EMU_REU=-reu -reusize $(EMU_REUSIZE) -reuimage build/reu-image.bin -reuimagerw
-EMU=$(EMU_CMD) $(EMU_BASE) $(EMU_KERNAL) $(EMU_DISK) $(EMU_REU)
-
 PCC=prog8c
 PCCARGSC64=-srcdirs src:src/c64 -plaintext -asmlist -target c64 -out build/
+PCCARGSCX16=-srcdirs src:src/cx16 -plaintext -asmlist -target cx16 -out build/
 PCCARGSVM=-srcdirs src:src/virtual -plaintext -asmlist -target virtual -out build/
 
-PROGS	= build/main.p8ir
-#PROGS	= build/mainc64.prg
+PROGS	= build/mainc64.prg build/maincx16.prg build/main.p8ir
 SRCS	= src/main.p8
 
 .PHONY:	all check test clean run emu
@@ -89,6 +83,10 @@ build:
 
 build/mainc64.prg: $(SRCS)
 	$(PCC) $(PCCARGSC64) $<
+	$(MV) build/main.prg $@
+
+build/maincx16.prg: $(SRCS)
+	$(PCC) $(PCCARGSCX16) $<
 	$(MV) build/main.prg $@
 
 build/main.p8ir: $(SRCS)
@@ -103,8 +101,11 @@ clean:
 run:	all
 	$(PCC) -vm build/main.p8ir
 
-emu:	build/mainc64.prg
-	$(EMU) -autostartprgmode 1 $<
+c64:	$(SRCS)
+	$(PCC) $(PCCARGSC64) $< -emu
+
+cx16:	$(SRCS)
+	$(PCC) $(PCCARGSCX16) $< -emu
 
 test:	all
 	$(PCC) -quiet $(PCCARGSVM) -emu $(SRCS) | diff -u tests/expected/virtual_main.txt -
