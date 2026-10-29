@@ -6,6 +6,11 @@ import shutil
 
 # --- CONFIGURATION ---
 TARGET_REPO = "https://github.com/irmen/prog8.git"
+# Only used for snapshot builds, which are matched by commit on this branch.
+# Release builds are matched by their version tag instead.
+TARGET_BRANCH = "master"
+# Compiler executable to match, e.g. "prog8c-beta" or "prog8c-llvm"
+PROG8C = "prog8c"
 REF_DIR = ".prog8-reference"
 VERSION_FILE = "VERSION"
 
@@ -77,23 +82,22 @@ def run_command(cmd, cwd=None, capture=False):
 
 
 def compiler_version():
-    """Return (version, commit) for the installed prog8c.
+    """Return (version, commit) for the installed PROG8C compiler.
 
     A release build prints only its version, e.g. "v12.3.4", and commit is None.
     A snapshot build (version contains a '-') also prints the commit it was
     built from.
     """
-    try:
-        output = subprocess.run(
-            ["prog8c", "-version"], capture_output=True, text=True
-        ).stdout
-    except FileNotFoundError:
-        print("\n❌ prog8c was not found in PATH.")
+    # which() also finds .bat/.cmd wrappers on Windows, which subprocess won't
+    prog8c = shutil.which(PROG8C)
+    if not prog8c:
+        print(f"\n❌ {PROG8C} was not found in PATH.")
         sys.exit(1)
+    output = subprocess.run([prog8c, "-version"], capture_output=True, text=True).stdout
 
     version = re.search(r"Prog8 compiler (v\S+)", output)
     if not version:
-        print(f"\n❌ Could not parse the prog8c version from:\n{output}")
+        print(f"\n❌ Could not parse the {PROG8C} version from:\n{output}")
         sys.exit(1)
     commit = re.search(r"git commit ([0-9a-f]+)", output)
     if "-" in version.group(1) and commit:
@@ -105,7 +109,7 @@ def main():
     print("🤖 Setting up filtered Prog8 agent reference files...")
 
     version, commit = compiler_version()
-    print(f"Matching prog8c {version}" + (f" (commit {commit})" if commit else ""))
+    print(f"Matching {PROG8C} {version}" + (f" (commit {commit})" if commit else ""))
 
     # 1. Clean up any existing target directory
     if os.path.exists(REF_DIR):
@@ -136,9 +140,10 @@ def main():
         print("Downloading target folders...")
         if commit:
             # Snapshot: the abbreviated commit can't be fetched directly, so
-            # fetch master's history (without blobs) and check out the commit.
+            # fetch the branch history (without blobs) and check out the commit.
             run_command(
-                ["git", "fetch", "--filter=blob:none", "origin", "master"], cwd=REF_DIR
+                ["git", "fetch", "--filter=blob:none", "origin", TARGET_BRANCH],
+                cwd=REF_DIR,
             )
             run_command(["git", "checkout", commit], cwd=REF_DIR)
         else:
@@ -150,7 +155,7 @@ def main():
         full_commit = run_command(["git", "rev-parse", "HEAD"], cwd=REF_DIR, capture=True)
 
         # 5. Scrub unwanted build/config files and images from the reference
-        print("Scrubbing build files, images and non-6502 material...")
+        print("Scrubbing build files and images...")
         for filename in FILES_TO_SCRUB:
             file_path = os.path.join(REF_DIR, filename)
             if os.path.exists(file_path):
