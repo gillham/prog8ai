@@ -80,7 +80,8 @@ The useful `make` targets are:
 | `make check` | Fast syntax check without compiling                       |
 | `make run`   | Compile for the virtual target and run it                 |
 | `make test`  | Run on the virtual target and compare with `tests/expected/` |
-| `make emu`   | Compile for the C64 and run it in VICE                    |
+| `make c64`   | Compile for the C64 and run it in VICE                    |
+| `make cx16`  | Compile for the Commander X16 and run it in x16emu        |
 | `make clean` | Remove everything in `build/`                             |
 
 # How the AI context works
