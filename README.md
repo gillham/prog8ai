@@ -23,15 +23,107 @@ grammar, standard library and example code, matching the version of the
 installed `prog8c` compiler.  This gives AI agents the upstream context
 without duplicating it here or checking out the whole compiler repository.
 
-# Usage
+# Prerequisites
 
-You *must* run `setup.py` to get the Prog8 reference materials for AI agent
-context.  It ends up in the `.prog8-reference` directory, which is in the 
-`.gitignore` file to avoid accidentally committing it.
+- **Java 17 or newer** to run the Prog8 compiler.  Check with `java -version`.
+  [Adoptium](https://adoptium.net/temurin/releases) has OpenJDK builds for
+  all platforms.
+- **The Prog8 compiler**, run as `prog8c`.  Download `prog8c-<version>-all.jar`
+  from the [Prog8 releases](https://github.com/irmen/prog8/releases), or see
+  the [installation docs](https://prog8.readthedocs.io/en/latest/compiling.html)
+  for other options.  Use v12.2 or newer.
+- **The 64tass assembler**, which the compiler runs to assemble its output.
+  Binaries are on [SourceForge](https://sourceforge.net/projects/tass64/files/binaries/),
+  and most Linux distributions and Homebrew have a `64tass` package.
+- **git**, **make** and **Python 3**.
+- *Optional:* the [VICE emulator](https://vice-emu.sourceforge.io/) for
+  `make emu`.  Everything else uses the compiler's built-in virtual target
+  and needs no emulator.
 
-Depending on your platform run one of these commands:
+The `Makefile` and `setup.py` both expect `prog8c` in your `PATH`.  If you
+downloaded the jar, a small wrapper script does the job.  On Linux or macOS
+save this as `prog8c` somewhere in your `PATH` and `chmod +x` it:
 ```
-py setup.py
-python setup.py
-python3 setup.py
+#!/bin/sh
+exec java -jar /path/to/prog8c-12.3.4-all.jar "$@"
 ```
+On Windows save this as `prog8c.cmd` in a folder on your `PATH`:
+```
+@java -jar C:\path\to\prog8c-12.3.4-all.jar %*
+```
+
+# Quick start
+
+1. On GitHub click **Use this template** to create your own repository,
+   then clone it.
+2. Download the Prog8 reference material for your installed compiler:
+   ```
+   python3 setup.py
+   ```
+   (On Windows use `py setup.py` or `python setup.py`.)
+3. Build and run the example program on the virtual target:
+   ```
+   make run
+   ```
+4. Start your AI coding assistant in the repository and ask it to write
+   some Prog8!
+
+`setup.py` puts the reference material in `.prog8-reference`, which is in
+`.gitignore` so it is never committed.  Run it again whenever you install
+a different version of the compiler.  It deletes and recreates the
+directory each time.
+
+The useful `make` targets are:
+
+| Target       | What it does                                              |
+|--------------|-----------------------------------------------------------|
+| `make check` | Fast syntax check without compiling                       |
+| `make run`   | Compile for the virtual target and run it                 |
+| `make test`  | Run on the virtual target and compare with `tests/expected/` |
+| `make emu`   | Compile for the C64 and run it in VICE                    |
+| `make clean` | Remove everything in `build/`                             |
+
+# How the AI context works
+
+`AGENTS.md` is the single source of instructions for AI agents.  The other
+agent files only point at it, so most tools pick it up without extra setup:
+
+| File                              | Tool                       |
+|-----------------------------------|----------------------------|
+| `CLAUDE.md`                       | Claude Code                |
+| `GEMINI.md`                       | Gemini CLI                 |
+| `.github/copilot-instructions.md` | GitHub Copilot             |
+| `.cursor/rules/prog8.mdc`         | Cursor                     |
+| `.aiassistant/rules/AGENT_RULES.md` | JetBrains AI Assistant   |
+
+`AGENTS.md` sends agents to the upstream skills, docs, grammar, standard
+library and examples in `.prog8-reference`.  The files in `.context/` add
+only what the upstream material doesn't already cover.  `setup.py` also
+links the upstream skills into `.claude/skills/` so Claude Code loads them
+automatically.
+
+If the reference material is missing, `AGENTS.md` tells the agent to stop
+and ask you to run `setup.py`.
+
+# Customizing
+
+- **A different compiler:** to match a beta or a locally built compiler
+  (such as `prog8c-beta`), change `PROG8C` at the top of `setup.py`
+  and `PCC` in the `Makefile`.  Snapshot builds are matched by commit, so
+  for a compiler built from a fork or another branch also change
+  `TARGET_REPO` and `TARGET_BRANCH`.
+- **Your program:** source goes in `src/`, starting with `src/main.p8`.
+  Code for one target only goes in a target directory such as `src/c64/`.
+  See `AGENTS.md` for the conventions.
+
+# License
+
+This template is released under the [0BSD license](LICENSE), so projects
+created from it can use any license they like.  Replace `LICENSE` with
+your own project's license, since the current one names the template's
+author as the copyright holder.
+
+The Prog8 material that `setup.py` downloads into `.prog8-reference` comes
+from the [Prog8 repository](https://github.com/irmen/prog8) and is under
+the GPLv3 license.  It is not part of this repository and is never
+committed to it.
