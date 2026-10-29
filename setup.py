@@ -13,6 +13,10 @@ TARGET_BRANCH = "master"
 PROG8C = "prog8c"
 REF_DIR = ".prog8-reference"
 VERSION_FILE = "VERSION"
+# Each upstream skill is linked here so Claude Code loads it automatically
+SKILL_LINK_DIR = ".claude/skills"
+# Marks a skill folder that was copied because symlinks weren't available
+COPY_MARKER = ".copied-from-prog8-reference"
 
 # Directories targeted for your agent context
 TOP_LEVEL_FOLDERS = [
@@ -105,6 +109,36 @@ def compiler_version():
     return version.group(1), None
 
 
+def link_skills():
+    """Link each upstream skill into SKILL_LINK_DIR, or copy it if needed.
+
+    Windows only allows symlinks with Developer Mode or admin rights, so a
+    failed symlink falls back to a copy.  Anything already there that we
+    didn't create (not a symlink, no COPY_MARKER) is left alone.
+    """
+    skills_dir = os.path.join(REF_DIR, ".agents", "skills")
+    os.makedirs(SKILL_LINK_DIR, exist_ok=True)
+    for skill in sorted(os.listdir(skills_dir)):
+        source = os.path.join(skills_dir, skill)
+        if not os.path.isdir(source):
+            continue
+        link = os.path.join(SKILL_LINK_DIR, skill)
+        if os.path.islink(link):
+            os.remove(link)
+        elif os.path.isdir(link):
+            if not os.path.exists(os.path.join(link, COPY_MARKER)):
+                print(f"⚠️  Skipping skill {skill}: {link} exists and isn't ours.")
+                continue
+            shutil.rmtree(link)
+        try:
+            os.symlink(os.path.relpath(source, SKILL_LINK_DIR), link)
+            print(f"Linked skill {skill}")
+        except OSError:
+            shutil.copytree(source, link)
+            open(os.path.join(link, COPY_MARKER), "w").close()
+            print(f"Copied skill {skill} (symlinks not available)")
+
+
 def main():
     print("🤖 Setting up filtered Prog8 agent reference files...")
 
@@ -184,6 +218,9 @@ def main():
         # 7. Record what was downloaded, since there is no .git to ask anymore
         with open(os.path.join(REF_DIR, VERSION_FILE), "w", encoding="utf-8") as f:
             f.write(f"{version}\n{full_commit}\n")
+
+        # 8. Make the upstream skills visible to Claude Code
+        link_skills()
 
         print(
             f"\n✅ Setup complete! Reference files for {version} are isolated in: /{REF_DIR}"

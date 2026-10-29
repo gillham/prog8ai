@@ -1,5 +1,9 @@
 # Agent context
 .prog8-reference/
+# Skill links created by setup.py
+.claude/skills/asm6502-coder
+.claude/skills/m68k-coder
+.claude/skills/prog8-coder
 # build artifacts
 build/
 # libdump output should be ignored anywhere we see it.
