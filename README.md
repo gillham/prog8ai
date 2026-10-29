@@ -23,6 +23,13 @@ use AI agents and provide context without duplication.
 
 # Usage
 
-You *must* init the git submodules if you did not recursively clone this repo.
-Run: `git submodule update --init` to clone the Prog8 compiler source
-as a submodule which is critical for AI context.
+You *must* run `setup.py` to get the Prog8 reference materials for AI agent
+context.  It ends up in the `.prog8-reference` directory, which is in the 
+`.gitignore` file to avoid accidentally committing it.
+
+Depending on your platform run one of these commands:
+```
+py setup.py
+python setup.py
+python3 setup.py
+```
